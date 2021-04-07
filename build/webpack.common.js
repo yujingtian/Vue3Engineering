@@ -24,7 +24,7 @@ module.exports = function(mode){
             include: path.resolve(__dirname, "..", "src"),
           },
           {
-            test: /\.less$/i,
+            test: /\.(css|less)$/i,
             use: [mode !== 'production' ? 'style-loader': MiniCssExtractPlugin.loader, 'css-loader','less-loader'],
           },
           {

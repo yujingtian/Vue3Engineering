@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory, RouteRecordRaw, Router, createWebHashHistory } from "vue-router"
 import Login from "../view/login/login.vue"
 import Main from "../view/main/index.vue"
-import UserRecord from "./modules/user"
+import UserRecord from "./systemManage"
 
 const routes:RouteRecordRaw[] = [
     {
