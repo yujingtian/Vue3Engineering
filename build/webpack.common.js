@@ -36,11 +36,6 @@ module.exports = function(mode){
           {
             test: /\.(png|svg|jpg|jpeg|gif)$/i,
             type: 'asset/resource',
-            parser: {
-              dataUrlCondition: {
-                maxSize: 2 * 1024,
-              },
-            },
             generator:{
               filename: util.assetsPath('images/[hash][ext]'),
             }

@@ -9,14 +9,14 @@
                 <img src="../assets/images/notice.png" class="mr8" alt="">
                 <div class="mr30 fs14 pointer textSpacing1">消息</div>
                 <img src="../assets/images/user.png" class="mr8" alt="">
-                <div class="mr8 fs14 pointer textSpacing1">俞菁田</div>
-                <img src="../assets/images/down.png" class="pointer" alt="">
-                <div v-if="false" class="absolute top60 c-999 fs14 line-height42 border pt15 pb15 bg-white left75" style="z-index:1000">
+                <div class="mr8 fs14 pointer textSpacing1" @click="accountHandler">{{$store.state.name}}</div>
+                <img src="../assets/images/down.png" class="pointer" alt="" @click="accountHandler">
+                <div v-if="ifAccount" class="absolute text-center w100 top60 c-999 fs14 line-height42 border pt15 pb15 bg-white left75" style="z-index:1000">
                     <div class="absolute textborder left50" style="top:-26px">
                         <img src="../assets/images/triangle.png" alt="">
                     </div>
-                    <div class="textSpacing3 pointer pl12 pr12 hover">修改密码</div>
-                    <div class="textSpacing3 pointer pl12 pr12 hover">退出登录</div>
+                    <!-- <div class="textSpacing3 pointer pl12 pr12 hover">修改密码</div> -->
+                    <div class="textSpacing3 pointer pl12 pr12 hover" @click="logout">退出登录</div>
                 </div>
             </div>
         </div> 
@@ -25,26 +25,22 @@
                 <i class="fa fa-backward fs15" style="color: #D4D4D4;"></i>
             </div>
             <div class="navList flex c-999 fs14 transition" style="flex:1;overflow-x:hidden" ref="navListBox" :style="{'marginLeft':'0px'}">
-                <div class="pl10 pr10 border-r-eee flex align-items-c pointer active">
-                    <div class="mr4 nowrap">工作台</div>
-                </div>
-                <div v-for="item in navList" class="pl10 pr10 border-r-eee flex align-items-c pointer">
-                    <div class="mr4 nowrap">{{item.name}}</div>
-                    <i class="fa fa-times-circle"></i>
+                <div v-for="item in $store.state.navList" class="pl10 pr10 border-r-eee flex align-items-c pointer" :class="{'active':item.active}">
+                    <div @click="navSelect(item)" class="mr4 nowrap">{{item.title}}</div>
+                    <i v-if="item.url !== '/main/home'" class="fa fa-times-circle"></i>
                 </div>
             </div>
             <div class="flex bg-white"  style="z-index:100">
                 <div class="w40 h40 flex align-items-c justify-content-c border-r-eee border-l-eee pointer" @click="navMoveRight">
                     <i class="fa fa-forward fs15" style="color: #D4D4D4;"></i>
                 </div>
-                <div class="flex align-items-c border-r-eee pl10 pr10 pointer">
+                <div class="flex align-items-c border-r-eee pl10 pr10 pointer" @click="navHandler">
                     <div class="c-999 fs14 mr3">关闭操作</div>
                     <img class="w7 h7" src="../assets/images/arrow.png" alt="" style="transform:rotate(90deg)">
                 </div>
-                <div v-if="false" class="absolute c-999 fs14 line-height42 border pt15 pb15 bg-white right0" style="top:100px">
-                    <div class="textSpacing3 pointer pl12 pr12 hover">单位当前选项卡</div>
-                    <div class="textSpacing3 pointer pl12 pr12 hover">关闭其他选项卡</div>
-                    <div class="textSpacing3 pointer pl12 pr12 hover">关闭所有选项卡</div>
+                <div v-if="ifNav" class="absolute c-999 fs14 line-height42 border pt15 pb15 bg-white right0" style="top:100px">
+                    <div class="textSpacing3 pointer pl12 pr12 hover" @click="closeOther">关闭其他选项卡</div>
+                    <div class="textSpacing3 pointer pl12 pr12 hover" @click="closeAll">关闭所有选项卡</div>
                 </div>
             </div>
         </div>
@@ -53,6 +49,7 @@
 
 <script lang="ts">
 import { Vue } from 'vue-class-component';
+import { logout } from "../api/login"
 
 interface navItem{
     name:string
@@ -74,9 +71,16 @@ export default class Nav extends Vue{
     private navList:Array<navItem> = []
     private dom:dom = {}
     private cacheWidth:number = 0
-
+    private ifNav:boolean = false
+    private ifAccount:boolean = false
     mounted(){
         this.dom = <dom>this.$refs.navListBox
+    }
+    private accountHandler(){
+        this.ifAccount = !this.ifAccount
+    }
+    private navHandler(){
+        this.ifNav = !this.ifNav
     }
 
     private navMoveLeft(){ 
@@ -107,6 +111,30 @@ export default class Nav extends Vue{
             this.cacheWidth = num - move
             this.dom.style!.marginLeft = (num - move) + "px"
         }
+    }
+
+    private navSelect(data:any){
+        this.$store.commit("navActive", data.url)
+        this.$router.push(data.url)
+    }
+
+    private closeOther(){
+        this.$store.commit("navListOtherDel")
+        this.ifNav = !this.ifNav
+    }
+
+    private closeAll(){
+        this.$store.commit("navListAllDel")
+        this.$router.push("/main/home")
+        this.ifNav = !this.ifNav
+    }
+
+    private logout(){
+        logout().then(res => {
+            if(res.code === 10000 || res.code === 30000){
+               this.$router.push("/login") 
+            }
+        })
     }
     
 }

@@ -2,6 +2,9 @@ import {createRouter, createWebHistory, RouteRecordRaw, Router, createWebHashHis
 import Login from "../view/login/login.vue"
 import Main from "../view/main/index.vue"
 import UserRecord from "./systemManage"
+import HomeRecord from "./home"
+import TaskRecord from "./Task"
+import NoticeCenter from "./noticeCenter"
 
 const routes:RouteRecordRaw[] = [
     {
@@ -17,15 +20,15 @@ const routes:RouteRecordRaw[] = [
         path:"/main",
         name:"Main",
         component:Main,
-        children:[...UserRecord]
+        children:[...UserRecord, ...HomeRecord,...TaskRecord,...NoticeCenter]
     }
 ]
+
 
 const router:Router = createRouter({
     history: createWebHashHistory(),
     routes
 })
-
 
 export default router
 

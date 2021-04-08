@@ -7,13 +7,13 @@
                 <ul>
                     <li v-for="node in menuList">
                         <a class="h48 Wpercent100 flex align-items-c pl32 pr32 bg-white" @click="menuClick(node)">
-                            <div class="iconfont h24 w24 fs24" :class="node.icon"></div>
-                            <span class="ml10 fs15 fwb c-333">{{node.nodeName}}</span>
+                            <div class="iconfont h24 w24 fs24" :class="node.logoTag"></div>
+                            <span class="ml10 fs15 fwb c-333">{{node.menuName}}</span>
                             <div class="ml80 transition" :class="{'arrowRotate': node.openStatus}"> <img class="w7" src="../assets/images/arrow.png" alt=""></div>
                         </a>
-                        <ul class="zIndexBottom transition overflow-h" :style="{'height':heightAuto(node, 2)}">
-                            <li v-for="item in node.children">
-                                <span class="h40 Wpercent100 flex align-items-c pl66 pr32 fs14">{{item.nodeName}}</span>
+                        <ul class="zIndexBottom transition overflow-h" :style="{'height':heightAuto(node, node.sysMenuList.length)}">
+                            <li v-for="item in node.sysMenuList">
+                                <span @click="moveTo(item)" :class="{'active':item.active}" class="h40 Wpercent100 flex align-items-c pl66 pr32 fs14">{{item.menuName}}</span>
                             </li>
                         </ul>
                     </li>
@@ -22,43 +22,53 @@
         </div>
 </template>
 <script lang="ts">
+import { zaMenuList } from '../api/main';
 import { Vue } from 'vue-class-component';
+import { navifExist } from "../store/index";
 
 interface menuItem{
-    nodeName:string
+    menuName:string
     openStatus?:boolean
-    children?:Array<menuItem>
-    path?:string
-    icon?:string
+    sysMenuList?:Array<menuItem>
+    url?:string
+    logoTag?:string,
+    active?:boolean
 }
 
 export default class Menu extends Vue {
     private ifabsolute = false
     private menuList:Array<menuItem> = [
         {
-            nodeName:"任务中心",
+            menuName:"任务中心",
             openStatus:false,
-            icon:'xc1',
-            children:[
+            sysMenuList:[
                 {
-                   nodeName:"我的代办",
+                    menuName:"我的代办",
+                    url:"/main/StayHandle",
+                    active:false
                 },
                 {
-                   nodeName:"我的预警",
+                    menuName:"我的预警",
+                    url:"/main/Warning",
+                    active:false
                 },
             ]
         },
         {
-            nodeName:"消息中心",
+            menuName:"消息中心",
             openStatus:false,
-            icon:'xc2',
-            children:[
+            sysMenuList:[
                 {
-                   nodeName:"我的消息",
+                    menuName:"我的消息",
+                    url:"/main/MyNotice",
+                    active:false
                 }
             ]
         },
     ]
+    created(){
+        this.getMenu()
+    }
     private menuClick(node:menuItem) {
         node.openStatus = !node.openStatus
     }
@@ -69,6 +79,31 @@ export default class Menu extends Vue {
             return 0 + "px"
         }
     }
+    private moveTo(item:any){
+        const ifExist = navifExist(item.url)
+        this.menuList.forEach(item1 => {
+            if(item1.sysMenuList!.length > 0){
+                item1.sysMenuList!.forEach(item2 => {
+                    item2.active = false
+                })
+            }
+        })
+        item.active = true
+        if(ifExist){
+            this.$store.commit("navActive", item.url)
+        }
+        
+        this.$router.push(item.url)
+    }
+
+    private getMenu(){
+        zaMenuList().then(res => {
+            if(res.code === 10000){
+                // this.menuList = res.data
+                console.log(res)
+            }
+        })
+    }
 }
 </script>
 <style lang="less" scoped>
@@ -77,5 +112,10 @@ export default class Menu extends Vue {
     }
     .arrowRotate{
         transform: rotate(90deg);
+    }
+    .active{
+        border-left: 4px solid #4878E6;
+        background-color: #eff2fa;
+        color: #4878E6;
     }
 </style>

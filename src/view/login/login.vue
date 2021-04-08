@@ -13,17 +13,17 @@
                     <div class="flex align-items-c mt60 mb25">
                         <div class="textSpacing5 fs16 mr20">账号</div>
                         <div>
-                            <input type="text" class="h50 w360 fs16 pl12">
+                            <input type="text" class="h50 w360 fs16 pl12" v-model="userName">
                         </div>
                     </div>
                     <div class="flex align-items-c">
                         <div class="textSpacing5 fs16 mr20">密码</div>
                         <div>
-                            <input type="text" class="h50 w360 fs16  pl12">
+                            <input type="password" class="h50 w360 fs16  pl12" v-model="password">
                         </div>
                     </div>
                 </div>
-                <div class="loginBtn h50 w400 white textSpacing4 ml40 fs20 line-height50 border-radius4 mt60">登录</div>
+                <div @click="login" class="loginBtn h50 w400 white textSpacing4 ml40 fs20 line-height50 border-radius4 mt60 pointer">登录</div>
             </div>
         </div>
         <div class="link Wpercent100 absolute bottom50 flex justify-content-c align-items-c">
@@ -44,17 +44,42 @@
 </template>
 <script lang="ts">
 import { Vue } from "vue-class-component"
+import { getSystemInfo, login } from "../../api/login"
+import { ToMd5, Tobase64, setToken } from "@/util"
 
-interface name{
-    name:String
-}
+export default class Login extends Vue{
 
-export default class Login extends Vue {
-    data():name{
-        return {
-            name:"俞菁田"
+    private userName:string = ""
+    private password:string = ""
+    
+    created(){
+        this.getSystemInfo()
+    }
+
+    private getSystemInfo(){
+        getSystemInfo().then(res => {
+            console.log(res)
+        })
+    }
+
+    private login(){
+        const str = this.userName
+        const arr = [];
+        for (let i = 0, j = str.length; i < j; ++i) {
+            arr.push(str.charCodeAt(i));
         }
-    }  
+        const tmpUint8Array = new Uint8Array(arr);
+        login({
+            userName:Tobase64(tmpUint8Array),
+            password:ToMd5(this.password)
+        }).then(res => {
+            if (res.code === 10000) {
+                setToken('csurfToken', res.data.token)					
+                this.$router.push("/main/home")
+                return;
+            }
+        })
+    }
 }
 </script>
 <style lang="less">

@@ -8,9 +8,10 @@
     </div>
 </template>
 <script lang="ts">
-import { Vue, Options } from 'vue-class-component';
+import { Vue, Options } from 'vue-class-component'
 import Menu from "@/components/menu.vue"
 import Nav from "@/components/navigation.vue"
+import { userSessionGet } from '../../api/main'
 
 @Options({
     components:{
@@ -19,7 +20,15 @@ import Nav from "@/components/navigation.vue"
     }
 })
 export default class Main extends Vue {
-    
+    created(){
+        this.getUserInfo()
+    }
+    private getUserInfo(){
+        userSessionGet().then(res => {
+            console.log(res)
+            this.$store.dispatch("getUserInfo", res.data.realname)
+        })
+    }
 }
 </script>
 <style lang="less" scoped>

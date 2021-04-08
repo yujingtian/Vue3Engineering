@@ -20,6 +20,11 @@ module.exports = merge(commonConfig(process.env.NODE_ENV), {
         filename: util.assetsPath('js/[name].[contenthash].js'),
         publicPath:""
     },
+    performance:{
+        hints:"warning",
+        maxEntrypointSize: 2000000,
+        maxAssetSize: 2000000,
+    },
     plugins: [
         new HtmlWebpackPlugin({
             title: 'webpack5 + vue3 + ts',
