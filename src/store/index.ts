@@ -73,6 +73,16 @@ export const store = createStore<State>({
                     value.active = false
                 }
             }
+        },
+        navListThisDel(state, data){
+            let value:NavList
+            const newNavList:NavList[] = []
+            for(value of state.navList){
+                if(value.url !== data){
+                    newNavList.push(value)
+                }
+            }
+            state.navList = newNavList
         }
     },
     actions: {
@@ -93,6 +103,9 @@ export const store = createStore<State>({
         },
         navActive(context, data:string){
             context.commit("navActive", data)
+        },
+        navListThisDel(context, data){
+            context.commit("navListThisDel", data)
         }
     },
     modules: {

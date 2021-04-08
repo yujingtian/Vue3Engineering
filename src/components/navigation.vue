@@ -25,9 +25,9 @@
                 <i class="fa fa-backward fs15" style="color: #D4D4D4;"></i>
             </div>
             <div class="navList flex c-999 fs14 transition" style="flex:1;overflow-x:hidden" ref="navListBox" :style="{'marginLeft':'0px'}">
-                <div v-for="item in $store.state.navList" class="pl10 pr10 border-r-eee flex align-items-c pointer" :class="{'active':item.active}">
+                <div v-for="(item, index) in $store.state.navList" class="pl10 pr10 border-r-eee flex align-items-c pointer" :class="{'active':item.active}">
                     <div @click="navSelect(item)" class="mr4 nowrap">{{item.title}}</div>
-                    <i v-if="item.url !== '/main/home'" class="fa fa-times-circle"></i>
+                    <i v-if="item.url !== '/main/home'" @click="closeNav(item.url, index)" class="fa fa-times-circle"></i>
                 </div>
             </div>
             <div class="flex bg-white"  style="z-index:100">
@@ -73,6 +73,9 @@ export default class Nav extends Vue{
     private cacheWidth:number = 0
     private ifNav:boolean = false
     private ifAccount:boolean = false
+    created(){
+        console.log(this.$store.state.navList)
+    }
     mounted(){
         this.dom = <dom>this.$refs.navListBox
     }
@@ -127,6 +130,14 @@ export default class Nav extends Vue{
         this.$store.commit("navListAllDel")
         this.$router.push("/main/home")
         this.ifNav = !this.ifNav
+    }
+
+    private closeNav(data:any, index:any, item:any){
+        console.log(index)
+        this.$store.commit("navListThisDel",data)
+        const prev = this.$store.state.navList[index - 1]
+        this.$store.commit("navActive", prev.url)
+        this.$router.push( prev.url )
     }
 
     private logout(){
